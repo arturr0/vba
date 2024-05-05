@@ -1,0 +1,58 @@
+Option Explicit
+
+Sub CopyExcelToWord()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim excelApp As Object
+    Dim excelWorkbook As Object
+    Dim excelSheet As Object
+    Dim copyRange As Range
+
+    ' Create or connect to Word application
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject("Word.Application")
+        wordApp.Visible = True
+    End If
+
+    ' Create a new Word document
+    Set wordDoc = wordApp.Documents.Add
+
+    ' Create or connect to Excel application
+    On Error Resume Next
+    Set excelApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If excelApp Is Nothing Then
+        Set excelApp = CreateObject("Excel.Application")
+        excelApp.Visible = True
+    End If
+
+    ' Open the Excel workbook (replace with the actual path)
+    Set excelWorkbook = excelApp.Workbooks.Open("C:\VB\Zeszyt3.xlsm")
+
+    ' Set the Excel sheet and range to copy
+    Set excelSheet = excelWorkbook.Sheets("Arkusz1") ' Replace with the actual sheet name
+    Set copyRange = excelSheet.Range("A1:C10") ' Replace with the actual range
+
+    ' Copy the Excel range to the Word document
+    copyRange.Copy
+
+    ' Paste the copied data into the Word document
+    wordApp.Selection.PasteSpecial DataType:=0  ' 0 is the constant value for wdPasteDefault
+
+    ' Close Excel workbook (optional)
+    excelWorkbook.Close False
+
+    ' Release objects
+    Set wordApp = Nothing
+    Set wordDoc = Nothing
+    Set excelApp = Nothing
+    Set excelWorkbook = Nothing
+    Set excelSheet = Nothing
+    Set copyRange = Nothing
+End Sub
+

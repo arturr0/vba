@@ -1,0 +1,79 @@
+Option Explicit
+
+Sub CopyLinesFromWordToExcel()
+    Dim excelApp As Object
+    Dim excelWorkbook As Object
+    Dim excelSheet As Object
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim colIndex As Long
+    Dim linesString As String
+    Dim lines() As String
+    Dim wordParagraph As Object
+    Dim line As Variant
+
+    ' Create or connect to Excel application
+    On Error Resume Next
+    Set excelApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If excelApp Is Nothing Then
+        Set excelApp = CreateObject("Excel.Application")
+        excelApp.Visible = True
+    End If
+
+    ' Create a new Excel workbook
+    Set excelWorkbook = excelApp.Workbooks.Add
+    ' Assuming data will be pasted in the first sheet
+    Set excelSheet = excelWorkbook.Sheets(1)
+
+    ' Create or connect to Word application
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject("Word.Application")
+        wordApp.Visible = True
+    End If
+
+    ' Open the Word document (replace "C:\Path\To\Your\Document.docx" with the actual path)
+    Set wordDoc = wordApp.Documents.Open("C:\VB\columns and rows.docx")
+
+    ' Initialize column index
+    colIndex = 1
+
+    ' Loop through each paragraph in Word and copy to Excel in columns
+    For Each wordParagraph In wordDoc.Paragraphs
+        ' Get the text from the paragraph
+        linesString = wordParagraph.Range.Text
+
+        ' Split the string into an array using a comma as the delimiter
+        lines = Split(linesString, ",")
+
+        ' Loop through the array and copy lines to Excel columns
+        For Each line In lines
+            ' Copy the line to the Excel cell (with Trim to remove leading/trailing spaces)
+            excelSheet.Cells(1, colIndex).Value = Trim(line)
+
+            ' Set the cell alignment to right
+            excelSheet.Cells(1, colIndex).HorizontalAlignment = xlRight
+
+            ' Move to the next column in Excel
+            colIndex = colIndex + 1
+        Next line
+    Next wordParagraph
+
+    ' Close Word and Excel applications (optional)
+    wordApp.Quit
+    excelApp.Quit
+
+    ' Release objects
+    Set wordApp = Nothing
+    Set excelApp = Nothing
+    Set wordDoc = Nothing
+    Set excelWorkbook = Nothing
+    Set excelSheet = Nothing
+    Set wordParagraph = Nothing
+End Sub
+

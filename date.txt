@@ -1,0 +1,19 @@
+Sub ChangeColorBasedOnSystemDate()
+    Dim currentDate As Date
+    Dim targetCell As Range
+    
+    ' Get the current system date
+    currentDate = Date
+    
+    ' Set the target cell
+    Set targetCell = ThisWorkbook.Sheets("Sheet1").Range("B2") ' Adjust sheet name and cell reference as needed
+    
+    ' Check if the current system date matches May 5, 2024
+    If currentDate = DateSerial(2024, 5, 5) Then
+        ' Change font color to red
+        targetCell.Font.Color = RGB(255, 0, 0) ' Red color
+    Else
+        ' Change font color to default (black)
+        targetCell.Font.ColorIndex = xlAutomatic
+    End If
+End Sub

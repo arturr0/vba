@@ -1,0 +1,84 @@
+Option Explicit
+
+Sub CopyWordsFromWordToExcel()
+    Dim excelApp As Object
+    Dim excelWorkbook As Object
+    Dim excelSheet As Object
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim rowIndex As Long
+    Dim colIndex As Long
+    Dim wordsString As String
+    Dim words() As String
+    Dim wordParagraph As Object
+    Dim word As Variant
+
+    ' Create or connect to Excel application
+    On Error Resume Next
+    Set excelApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If excelApp Is Nothing Then
+        Set excelApp = CreateObject("Excel.Application")
+        excelApp.Visible = True
+    End If
+
+    ' Create a new Excel workbook
+    Set excelWorkbook = excelApp.Workbooks.Add
+    ' Assuming data will be pasted in the first sheet
+    Set excelSheet = excelWorkbook.Sheets(1)
+
+    ' Create or connect to Word application
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject("Word.Application")
+        wordApp.Visible = True
+    End If
+
+    ' Open the Word document (replace "C:\Path\To\Your\Document.docx" with the actual path)
+    Set wordDoc = wordApp.Documents.Open("C:\VB\columns and rows.docx")
+
+    ' Initialize row and column indices
+    rowIndex = 1
+    colIndex = 1
+
+    ' Loop through each paragraph in Word and copy to Excel in rows and columns
+    For Each wordParagraph In wordDoc.Paragraphs
+        ' Get the text from the paragraph
+        wordsString = wordParagraph.Range.Text
+
+        ' Split the string into an array using a comma as the delimiter
+        words = Split(wordsString, ",")
+
+        ' Loop through the array and copy words to Excel rows and columns
+        For Each word In words
+            ' Copy the word to the Excel cell
+            excelSheet.Cells(rowIndex, colIndex).Value = Trim(word)
+
+            ' Move to the next column in Excel
+            colIndex = colIndex + 1
+
+            ' If the end of the row is reached, move to the next row and reset the column index
+            If colIndex > UBound(words) + 1 Then
+                rowIndex = rowIndex + 1
+                colIndex = 1
+            End If
+        Next word
+    Next wordParagraph
+
+    ' Close Word and Excel applications (optional)
+    wordApp.Quit
+    excelApp.Quit
+
+    ' Release objects
+    Set wordApp = Nothing
+    Set excelApp = Nothing
+    Set wordDoc = Nothing
+    Set excelWorkbook = Nothing
+    Set excelSheet = Nothing
+    Set wordParagraph = Nothing
+End Sub
+

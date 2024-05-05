@@ -1,0 +1,75 @@
+Option Explicit
+
+Sub CopyWordsToExcel()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim excelApp As Object
+    Dim excelWorkbook As Object
+    Dim excelSheet As Object
+    Dim rowIndex As Long
+    Dim lineText As String
+    Dim words() As String
+    Dim wordParagraph As Object ' Declare wordParagraph variable
+
+    ' Create or connect to Word application
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject("Word.Application")
+        wordApp.Visible = True
+    End If
+
+    ' Open the Word document
+    Set wordDoc = wordApp.Documents.Open("C:\VB\R.docx") ' Replace with the actual path
+
+    ' Create or connect to Excel application
+    On Error Resume Next
+    Set excelApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If excelApp Is Nothing Then
+        Set excelApp = CreateObject("Excel.Application")
+        excelApp.Visible = True
+    End If
+
+    ' Create a new Excel workbook
+    Set excelWorkbook = excelApp.Workbooks.Add
+    ' Assuming data will be pasted in the first sheet
+    Set excelSheet = excelWorkbook.Sheets(1)
+
+    ' Initialize the row index
+    rowIndex = 1
+
+    ' Loop through each line in Word and copy to Excel in two columns
+    For Each wordParagraph In wordDoc.Paragraphs
+        ' Get the text from the line
+        lineText = wordParagraph.Range.Text
+
+        ' Split the line into an array using a comma as the delimiter
+        words = Split(lineText, ",")
+
+        ' If there are two words, copy them to Excel in two columns
+        If UBound(words) = 1 Then
+            ' Copy the words to Excel columns
+            excelSheet.Cells(rowIndex, 1).Value = Trim(words(0))
+            excelSheet.Cells(rowIndex, 2).Value = Trim(words(1))
+            
+            ' Move to the next row in Excel
+            rowIndex = rowIndex + 1
+        End If
+    Next wordParagraph
+
+    ' Close Word and Excel applications (optional)
+    wordApp.Quit
+    excelApp.Quit
+
+    ' Release objects
+    Set wordApp = Nothing
+    Set excelApp = Nothing
+    Set wordDoc = Nothing
+    Set excelWorkbook = Nothing
+    Set wordParagraph = Nothing
+    Set excelSheet = Nothing
+End Sub

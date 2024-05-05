@@ -1,0 +1,26 @@
+Option Explicit
+Dim wordApp As Word.Application
+Dim mojDok As Word.Document
+
+Sub Zapis()
+    Dim zakres As Range
+    Dim sciezka As String
+
+    sciezka = "C:\"
+    Set zakres = Arkusz1.Range("A1").CurrentRegion
+
+    ' Create or connect to Word application
+    If wordApp Is Nothing Then
+        Set wordApp = New Word.Application
+        wordApp.Visible = True
+    End If
+
+    ' Create a new Word document
+    Set mojDok = wordApp.Documents.Add()
+    zakres.Copy
+    With mojDok
+        .Paragraphs(1).Range.PasteExcelTable True, True, True
+    End With
+    ' Rest of your code goes here
+End Sub
+

@@ -1,0 +1,68 @@
+Sub CopyExcelToWord()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim excelApp As Object
+    Dim excelWorkbook As Object
+    Dim excelSheet As Object
+    Dim dataRange As Range
+    Dim row As Range
+    Dim cell As Range
+    Dim textToCopy As String
+
+    ' Create or connect to Word application
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject("Word.Application")
+        wordApp.Visible = True
+    End If
+
+    ' Create a new Word document
+    Set wordDoc = wordApp.Documents.Add
+
+    ' Create or connect to Excel application
+    On Error Resume Next
+    Set excelApp = GetObject(, "Excel.Application")
+    On Error GoTo 0
+
+    If excelApp Is Nothing Then
+        Set excelApp = CreateObject("Excel.Application")
+        excelApp.Visible = True
+    End If
+
+    ' Open the Excel workbook (replace with the actual path)
+    Set excelWorkbook = excelApp.Workbooks.Open("C:\VB\write coma.xlsm")
+
+    ' Set the Excel sheet and range to copy
+    Set excelSheet = excelWorkbook.Sheets("Arkusz1") ' Replace with the actual sheet name
+    Set dataRange = excelSheet.UsedRange ' Assumes data starts from A1
+
+    ' Loop through each row and concatenate values with commas
+    For Each row In dataRange.Rows
+        For Each cell In row.Cells
+            textToCopy = textToCopy & cell.Value & ","
+        Next cell
+
+        ' Remove the trailing comma
+        textToCopy = Left(textToCopy, Len(textToCopy) - 1) & vbCrLf
+    Next row
+
+    ' Paste the concatenated text into Word
+    wordApp.Selection.TypeText textToCopy
+
+    ' Close Excel workbook (optional)
+    excelWorkbook.Close False
+
+    ' Release objects
+    Set wordApp = Nothing
+    Set wordDoc = Nothing
+    Set excelApp = Nothing
+    Set excelWorkbook = Nothing
+    Set excelSheet = Nothing
+    Set dataRange = Nothing
+    Set row = Nothing
+    Set cell = Nothing
+End Sub
+
